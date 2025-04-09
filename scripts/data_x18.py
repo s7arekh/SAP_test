@@ -10,7 +10,7 @@ class Datax18:
         self.X, self.y = self._prepare_data()
         
     def _prepare_data(self):
-        l = len(self.model_series) - self.n_prev - self.horizon + 1
+        l = len(self.observed_series) - self.n_prev - self.horizon + 1
         X = np.zeros((l, 2 * self.n_prev + self.horizon))
         y = np.zeros(l)
         for i in range(l):
