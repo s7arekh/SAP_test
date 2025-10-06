@@ -63,13 +63,6 @@ python predict.py --depth 6 --need_plot --device cuda --path_to_save results
 - **Горизонт предсказания**: 18 месяцев вперед
 - **Нормализация**: Данные нормализуются по максимальному значению наблюдаемого ряда
 
-## Требования к системе
-
-- Python 3.8+
-- PyTorch 1.12+
-- CUDA (опционально, для ускорения на GPU)
-- macOS Metal Performance Shaders (MPS) поддержка для Apple Silicon
-
 ## Данные
 
 Проект использует данные из:
