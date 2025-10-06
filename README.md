@@ -66,5 +66,5 @@ python predict.py --depth 6 --need_plot --device cuda --path_to_save results
 ## Данные
 
 Проект использует данные из:
-- [SILSO (Sunspot Index and Long-term Solar Observations)](https://www.sidc.be/SILSO/)
+- [SILSO (Sunspot Index and Long-term Solar Observations)](https://www.sidc.be/SILSO/datafiles)
 - Теоретические данные солнечной активности из локального файла
