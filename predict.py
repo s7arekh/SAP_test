@@ -16,7 +16,45 @@ from scripts.model_x18 import NARXx18
 import datetime
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
+import requests
 
+
+def download_ssn_data(url):
+    """
+    Пробует безопасное соединение, если не работает - использует небезопасное
+    """
+    import tempfile
+
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+    }
+
+    try:
+        print("Пробуем безопасное соединение...")
+        response = requests.get(url, headers=headers, timeout=30, verify=True)
+        response.raise_for_status()
+        print("✓ Безопасное соединение установлено")
+
+    except requests.exceptions.SSLError:
+        print("⚠ SSL ошибка, используем небезопасное соединение...")
+        response = requests.get(url, headers=headers, timeout=30, verify=False)
+        response.raise_for_status()
+
+    # Остальной код тот же...
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False, encoding='utf-8') as f:
+        f.write(response.text)
+        temp_path = f.name
+
+    df = pd.read_csv(
+        temp_path,
+        sep=';',
+        header=None,
+        names=['Year', 'Month', 'Decimal Date', 'SSN', 'Std Dev', 'Obs', 'Def'],
+        usecols=[2, 3]
+    )
+
+    os.unlink(temp_path)
+    return df
 
 def _prepare_data(ssn_url: str, theoretical_path: str) -> Tuple[np.ndarray, np.ndarray, float]:
     """
@@ -34,13 +72,7 @@ def _prepare_data(ssn_url: str, theoretical_path: str) -> Tuple[np.ndarray, np.n
     """
     df_theoretical = pd.read_csv(theoretical_path, sep=';')
     
-    df_ssn = pd.read_csv(
-        ssn_url,
-        sep=';',
-        header=None,
-        names=['Year', 'Month', 'Decimal Date', 'SSN', 'Std Dev', 'Obs', 'Def'],
-        usecols=[2, 3]
-    )
+    df_ssn = download_ssn_data(ssn_url)
 
     min_date = df_theoretical['decimal_date'].iloc[0]
     mask_valid = (df_ssn['Decimal Date'] >= min_date) & (df_ssn['SSN'].shift(1) != -1)
